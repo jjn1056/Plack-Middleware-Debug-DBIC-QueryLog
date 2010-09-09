@@ -37,8 +37,8 @@ sub build_per_context_instance {
     ## Needs to better handle the 'pass through from conf option, and if
     ## there is not engine, such as when you are doing commandline stuff
     if(defined $ctx->engine->env) {
-        my $querylog = $ctx->engine->env->{'plack.middleware.dbic.querylog'} ||
-          DBIx::Class::QueryLog->new($self->querylog_args);
+        my $querylog = $ctx->engine->env->{'plack.middleware.debug.dbic.querylog'} ||
+          $self->querylog || DBIx::Class::QueryLog->new($self->querylog_args);
         $self->querylog($querylog);
         $self->clear_querylog_analyzer;
 
@@ -58,15 +58,38 @@ Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack - Use a Plack Midd
 
 =head2 SYNOPSIS
 
-    TBD
+    package MyApp::Web::Model::Schema;
+    use parent 'Catalyst::Model::DBIC::Schema';
+
+	__PACKAGE__->config({
+        schema_class => 'MyApp::Schema',
+        traits => ['QueryLog::AdoptPlack'],
+        ## .. rest of configuration
+	});
 
 =head1 DESCRIPTION
 
-    TBD
+This is a trait for L<Catalyst::Model::DBIC::Schema> which adopts a L<Plack>
+created L<DBIx::Class::QueryLog> and logs SQL for a given request cycle.  It is
+intended to be compatible with L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>
+which you may already be using.
 
 =head1 OPTIONS
 
-    TBD
+This model defines the following options.
+
+=head2 querylog
+
+Takes a L<DBIx::Class::QueryLog> object, which is used as the querylog for the
+application.  Generally the whole point of this trait is to adopt the query log
+provided by the L<Plack> middleware, but if you have special needs you can set
+an instance here.  You may wish to do this if you have complicated instatiation
+needs.
+
+=head2 querylog_args
+
+Takes a HashRef which is passed to L<DBIx::Class::QueryLog> at construction, 
+if needed.
 
 =head1 SEE ALSO
 
