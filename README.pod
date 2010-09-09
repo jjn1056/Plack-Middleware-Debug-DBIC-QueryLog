@@ -1,0 +1,66 @@
+=head1 NAME
+
+Plack::Middleware::Debug::DBIC::QueryLog - Log DBIC Queries
+
+=head2 SYNOPSIS
+
+    use Plack::Builder;
+
+    my $app = ...; ## Build your Plack App
+
+    builder {
+        enable 'Debug::DBIC::QueryLog', querylog_args => {passthrough => 1}; 
+        $app;
+    };
+
+You need to 'tell' your applications instance of L<DBIx::Class> to use the 
+L<DBIx::Class::QueryLog> object, which is stored in the L<Plack> C<$env> at
+C<$env->{'plack.middleware.dbic.querylog'}>.  If you are using L<Catalyst> and
+a modern L<Catalyst::Model::DBIC::Schema> you can use the supplied trait
+L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>, which is 
+compatible with L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>.  For
+example in you L<Catalyst::Model::DBIC::Schema> model:
+
+    package MyApp::Web::Model::Schema;
+    use parent 'Catalyst::Model::DBIC::Schema';
+
+	__PACKAGE__->config({
+        schema_class => 'MyApp::Schema',
+        traits => ['QueryLog::AdoptPlack'],
+		connect_info => {
+			dsn => 'dbi:SQLite:dbname=__path_to(share,var,sqlite.db)__',
+		},
+	});
+
+    1;
+
+=head1 DESCRIPTION
+
+Adds a debug panel and querylog object for logging L<DBIx::Class> queries.  Has
+support for L<Catalyst> via a L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>
+compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>.
+
+=head1 OPTIONS
+
+This debug panel defines the following options.
+
+=head2 querylog_args
+
+Takes a HashRef which is passed to L<DBIx::Class::QueryLog> at construction.
+
+=head1 SEE ALSO
+
+L<Plack::Middleware::Debug>
+
+=head1 AUTHOR
+
+John Napiorkowski, C<< <jjnapiork@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
