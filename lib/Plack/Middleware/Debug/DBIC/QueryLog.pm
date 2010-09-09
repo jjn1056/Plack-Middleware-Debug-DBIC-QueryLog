@@ -30,7 +30,8 @@ compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlac
         $app;
     };
 
-And in you L<Catalyst> application.
+And in you L<Catalyst> application, if you are also using
+L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>
 
     package MyApp::Web::Model::Schema;
     use parent 'Catalyst::Model::DBIC::Schema';
@@ -80,7 +81,7 @@ L<DBIx::Class>'s debug object correctly:
 That way when you view the debug panel, we have SQL to review.
 
 If you are using L<Catalyst> and a modern L<Catalyst::Model::DBIC::Schema> you
-can use the supplied trait
+can use the trait
 L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>, which is
 compatible with L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>.  See the
 L</SYNOPSIS> example for more details.
