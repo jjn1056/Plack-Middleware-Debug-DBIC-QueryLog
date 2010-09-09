@@ -57,7 +57,7 @@ L<Plack::Middleware::Debug> so that the table of our querylog would appear as
 a neat Plack based Debug panel.  This bit of middleware provides that function.
 
 Basically we create a new instance of L<DBIx::Class::QueryLog> and place it
-into C<$env->>{'plack.middleware.debug.dbic.querylog'}> so that it is accessible by
+into C<< $env->{'plack.middleware.debug.dbic.querylog'} >> so that it is accessible by
 all applications running inside of L<Plack>.  You need to 'tell' your application's
 instance of L<DBIx::Class> to use this C<$env> key and make sure you set
 L<DBIx::Class>'s debug object correctly:
