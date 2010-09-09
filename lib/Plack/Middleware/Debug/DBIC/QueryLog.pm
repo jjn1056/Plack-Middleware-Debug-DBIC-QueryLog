@@ -8,7 +8,7 @@ use warnings;
 
 use DBIx::Class::QueryLog;
 use DBIx::Class::QueryLog::Analyzer;
-use Plack::Util::Accessor qw(querylog_args);
+use Plack::Util::Accessor qw(querylog querylog_args);
 
 =head1 NAME
 
@@ -56,6 +56,14 @@ compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlac
 
 This debug panel defines the following options.
 
+=head2 querylog
+
+Takes a L<DBIx::Class::QueryLog> object, which is used as the querylog for the
+application.  If you don't provide this, we will build one automatically, using
+L</querylog_args> if provided.  Generally you will use this only if you are 
+instantiating a querylog object outside your L<Plack> based application, such
+as in an IOC container like L<Bread::Board>.
+
 =head2 querylog_args
 
 Takes a HashRef which is passed to L<DBIx::Class::QueryLog> at construction.
@@ -78,14 +86,14 @@ it under the same terms as Perl itself.
 my $template = __PACKAGE__->build_template(join '', <DATA>);
 sub run {
     my ( $self, $env, $panel ) = @_;
-        my $querylog = DBIx::Class::QueryLog->new($self->querylog_args || {});
+    my $querylog = $self->querylog ||
+      DBIx::Class::QueryLog->new($self->querylog_args || {});
     $env->{'plack.middleware.dbic.querylog'} = $querylog;
     $panel->title('Catalyst::DBIC::QueryLog');
     return sub {
         my $querylog_analyzer = DBIx::Class::QueryLog::Analyzer->new({
             querylog => $querylog,
         });
-       
         if(@{$querylog_analyzer->get_sorted_queries}) {
             $panel->nav_subtitle(sprintf('Total Seconds: %.6f', $querylog->time_elapsed));
             $panel->content(sub {
