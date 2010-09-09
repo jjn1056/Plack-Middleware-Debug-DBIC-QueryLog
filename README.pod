@@ -44,6 +44,14 @@ compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlac
 
 This debug panel defines the following options.
 
+=head2 querylog
+
+Takes a L<DBIx::Class::QueryLog> object, which is used as the querylog for the
+application.  If you don't provide this, we will build one automatically, using
+L</querylog_args> if provided.  Generally you will use this only if you are 
+instantiating a querylog object outside your L<Plack> based application, such
+as in an IOC container like L<Bread::Board>.
+
 =head2 querylog_args
 
 Takes a HashRef which is passed to L<DBIx::Class::QueryLog> at construction.
