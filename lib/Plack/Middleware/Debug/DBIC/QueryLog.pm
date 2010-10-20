@@ -10,6 +10,7 @@ use DBIx::Class::QueryLog;
 use DBIx::Class::QueryLog::Analyzer;
 use Text::MicroTemplate qw(encoded_string);
 use Plack::Util::Accessor qw(querylog querylog_args);
+## use SQL::Abstract::Tree;
 
 =head1 NAME
 
@@ -120,7 +121,8 @@ it under the same terms as Perl itself.
 =cut
 
 my $template = __PACKAGE__->build_template(join '', <DATA>);
-use SQL::Abstract::Tree;
+##my $sqla_tree = SQL::Abstract::Tree->new({profile => 'html'});
+
 sub run {
     my ( $self, $env, $panel ) = @_;
     my $querylog = $self->querylog ||
@@ -128,15 +130,14 @@ sub run {
     $env->{'plack.middleware.debug.dbic.querylog'} = $querylog;
     $panel->title('DBIC::QueryLog');
     return sub {
-        my $sqla_tree = SQL::Abstract::Tree->new({profile => 'html'});
         my $querylog_analyzer = DBIx::Class::QueryLog::Analyzer->new({
             querylog => $querylog,
         });
-
         if(@{$querylog_analyzer->get_sorted_queries}) {
             $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
             $panel->content(sub {
-                $self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
+                    ##$self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
+                    $self->render($template, [$querylog, $querylog_analyzer]);
             });
         } else {
             $panel->nav_subtitle("No SQL");
@@ -151,9 +152,44 @@ __DATA__
 % my ($querylog, $querylog_analyzer, $sqla_tree) = @{shift @_};
 % my $qcount = $querylog->count;
 % my $total = sprintf('%.6f', $querylog->time_elapsed);
-
 % my $average_time = sprintf('%.6f', ($querylog->time_elapsed / $qcount));
-<div id="querylog_box">
+<style>
+
+#box-table-a
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	text-align: left;
+    border-collapse: collapse;    
+}
+#box-table-a th
+{
+	font-size: 13px;
+	font-weight: normal;
+	padding: 8px;
+	background: #b9c9fe;
+	border-top: 4px solid #aabcfe;
+	border-bottom: 1px solid #fff;
+	color: #039;
+    white-space:nowrap;
+}
+#box-table-a td
+{
+	padding: 8px;
+	background: #e8edff; 
+	border-bottom: 1px solid #fff;
+	color: #669;
+	border-top: 1px solid transparent;
+}
+#box-table-a tr:hover td
+{
+	background: #d0dafd;
+	color: #339;
+}
+
+
+</style>
+<div>
   <br/>
   <p>
     <ul>
@@ -162,8 +198,8 @@ __DATA__
       <li>Average Time per Statement: <b><%= $average_time %> seconds</b></li>
     </ul>
   </p>
-  <table style="clear:both">
-    <thead>
+  <table id="box-table-a">
+    <thead class="query_header">
       <tr>
         <th>Time Elapsed</th>
         <th>Percent Of Total</th>
@@ -174,17 +210,16 @@ __DATA__
     <tbody>
 % my $odd = 0;
 % for my $q (@{$querylog_analyzer->get_sorted_queries}) {
-%   my @params = @{$q->params};
-%   my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
+%   #my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
        <tr <%= $odd ? "class=odd":"" %> >
-        <td><b><%= sprintf('%.6f', $q->time_elapsed) %></b></td>
+        <td style="border-left: 1px solid #aabcfe;"><b><%= sprintf('%.6f', $q->time_elapsed) %></b></td>
         <td><b><%= sprintf('%.1f', (($q->time_elapsed / $total ) * 100 )) %>%</b></td>
-        <td><%= $tree_info %></td>
-        <td><ul>
-% foreach my $param (@params) {
-            <li type="square"><%= $param %></li>
+        <td><%= $q->sql %></td>
+        <td style="border-right: 1px solid #aabcfe;"><ol>
+% foreach my $param (@{$q->params}) {
+            <li style="margin-left:30px;white-space:nowrap"><%= $param %></li>
 % }
-        </ul></td>
+        </ol></td>
       </tr>
 % $odd = $odd ? 0:1;
 % }
@@ -192,5 +227,4 @@ __DATA__
   </table>
 </div>
 <br/>
-<p><%= scalar(localtime) %></p>
-<hr/>
+
