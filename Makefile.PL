@@ -8,6 +8,7 @@ requires 'Plack';
 requires 'Plack::Middleware::Debug';
 requires 'DBIx::Class::QueryLog';
 requires 'DBIx::Class::QueryLog::Analyzer';
+requires 'SQL::Abstract';
 
 build_requires 'Test::More' => '0.96';
 
