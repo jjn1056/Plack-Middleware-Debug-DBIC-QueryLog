@@ -1,4 +1,9 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.02    20 October 2010
+        - style changes
+        - correct title error
+        - get ready for the SQL::Abstract::Tree stuff
+
 0.01    9 September 2010
         - First release, buyer beware.
