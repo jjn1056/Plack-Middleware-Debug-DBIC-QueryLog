@@ -1,6 +1,6 @@
 package Plack::Middleware::Debug::DBIC::QueryLog;
 use parent qw(Plack::Middleware::Debug::Base);
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use 5.008;
 use strict;
@@ -10,7 +10,7 @@ use DBIx::Class::QueryLog;
 use DBIx::Class::QueryLog::Analyzer;
 use Text::MicroTemplate qw(encoded_string);
 use Plack::Util::Accessor qw(querylog querylog_args);
-## use SQL::Abstract::Tree;
+use SQL::Abstract::Tree;
 
 =head1 NAME
 
@@ -121,7 +121,7 @@ it under the same terms as Perl itself.
 =cut
 
 my $template = __PACKAGE__->build_template(join '', <DATA>);
-##my $sqla_tree = SQL::Abstract::Tree->new({profile => 'html'});
+my $sqla_tree = SQL::Abstract::Tree->new({profile => 'html'});
 
 sub run {
     my ( $self, $env, $panel ) = @_;
@@ -136,8 +136,8 @@ sub run {
         if(@{$querylog_analyzer->get_sorted_queries}) {
             $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
             $panel->content(sub {
-                    ##$self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
-                    $self->render($template, [$querylog, $querylog_analyzer]);
+                    $self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
+                    ## $self->render($template, [$querylog, $querylog_analyzer]);
             });
         } else {
             $panel->nav_subtitle("No SQL");
@@ -210,11 +210,11 @@ __DATA__
     <tbody>
 % my $odd = 0;
 % for my $q (@{$querylog_analyzer->get_sorted_queries}) {
-%   #my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
+%   my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
        <tr <%= $odd ? "class=odd":"" %> >
         <td style="border-left: 1px solid #aabcfe;"><b><%= sprintf('%.6f', $q->time_elapsed) %></b></td>
         <td><b><%= sprintf('%.1f', (($q->time_elapsed / $total ) * 100 )) %>%</b></td>
-        <td><%= $q->sql %></td>
+        <td><%= $tree_info %></td>
         <td style="border-right: 1px solid #aabcfe;"><ol>
 % foreach my $param (@{$q->params}) {
             <li style="margin-left:30px;white-space:nowrap"><%= $param %></li>

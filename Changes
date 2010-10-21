@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.03    21 October 2010
+        - using SQL::Abstract:Tree for neating appearance
+        - and more css and html tweaks
+
 0.02    20 October 2010
         - style changes
         - correct title error
