@@ -75,9 +75,9 @@ all applications running inside of L<Plack>.  You need to 'tell' your applicatio
 instance of L<DBIx::Class> to use this C<$env> key and make sure you set
 L<DBIx::Class>'s debug object correctly:
 
-        my $querylog = $ctx->engine->env->{'plack.middleware.debug.dbic.querylog'};
-        $schema->storage->debugobj($querylog);
-        $schema->storage->debug(1);
+    my $querylog = $ctx->engine->env->{'plack.middleware.debug.dbic.querylog'};
+    $schema->storage->debugobj($querylog);
+    $schema->storage->debug(1);
 
 That way when you view the debug panel, we have SQL to review.
 
@@ -152,42 +152,6 @@ __DATA__
 % my $qcount = $querylog->count;
 % my $total = sprintf('%.6f', $querylog->time_elapsed);
 % my $average_time = sprintf('%.6f', ($querylog->time_elapsed / $qcount));
-<style>
-
-#box-table-a
-{
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
-	font-size: 12px;
-	text-align: left;
-    border-collapse: collapse;    
-}
-#box-table-a th
-{
-	font-size: 13px;
-	font-weight: normal;
-	padding: 8px;
-	background: #b9c9fe;
-	border-top: 4px solid #aabcfe;
-	border-bottom: 1px solid #fff;
-	color: #039;
-    white-space:nowrap;
-}
-#box-table-a td
-{
-	padding: 8px;
-	background: #e8edff; 
-	border-bottom: 1px solid #fff;
-	color: #669;
-	border-top: 1px solid transparent;
-}
-#box-table-a tr:hover td
-{
-	background: #d0dafd;
-	color: #339;
-}
-
-
-</style>
 <div>
   <br/>
   <p>
@@ -201,26 +165,20 @@ __DATA__
     <thead class="query_header">
       <tr>
         <th>Time Elapsed</th>
-        <th>Percent Of Total</th>
+        <th>Percentage</th>
         <th>SQL Statement</th>
-        <th>Bind Parameters</th>
       </tr>
     </thead>
     <tbody>
-% my $odd = 0;
+% my $even = 1;
 % for my $q (@{$querylog_analyzer->get_sorted_queries}) {
 %   my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
-       <tr <%= $odd ? "class=odd":"" %> >
-        <td style="border-left: 1px solid #aabcfe;"><b><%= sprintf('%.6f', $q->time_elapsed) %></b></td>
-        <td><b><%= sprintf('%.1f', (($q->time_elapsed / $total ) * 100 )) %>%</b></td>
-        <td><%= $tree_info %></td>
-        <td style="border-right: 1px solid #aabcfe;"><ol>
-% foreach my $param (@{$q->params}) {
-            <li style="margin-left:30px;white-space:nowrap"><%= $param %></li>
-% }
-        </ol></td>
+       <tr <%= $even ? "class=plDebugOdd":"plDebugEven" %> >
+        <td style="padding-left:9px"><%= sprintf('%.7f', $q->time_elapsed) %></td>
+        <td style="padding-left:9px"><%= sprintf('%.2f', (($q->time_elapsed / $total ) * 100 )) %>%</td>
+        <td style="padding-left:9px; padding-bottom:6px"><%= $tree_info %></td>
       </tr>
-% $odd = $odd ? 0:1;
+% $even = $even ? 0:1;
 % }
     </tbody>
   </table>

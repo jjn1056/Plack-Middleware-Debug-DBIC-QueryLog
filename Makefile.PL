@@ -8,9 +8,9 @@ requires 'Plack';
 requires 'Plack::Middleware::Debug';
 requires 'DBIx::Class::QueryLog';
 requires 'DBIx::Class::QueryLog::Analyzer';
-requires 'SQL::Abstract';
+requires 'SQL::Abstract', '1.70';
 
-test_requires 'Test::More' => '0.96';
+test_requires 'Test::More', '0.96';
 
 require 'maint/Makefile.PL.include'
   if $Module::Install::AUTHOR;
