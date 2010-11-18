@@ -12,7 +12,7 @@ requires 'SQL::Abstract';
 
 test_requires 'Test::More' => '0.96';
 
-require 'maint_Makefile.PL.include'
+require 'maint/Makefile.PL.include'
   if $Module::Install::AUTHOR;
 
 WriteAll;

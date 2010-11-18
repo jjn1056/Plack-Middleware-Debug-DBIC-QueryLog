@@ -22,13 +22,14 @@ Adds a debug panel and querylog object for logging L<DBIx::Class> queries.  Has
 support for L<Catalyst> via a L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>
 compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>.
 
-
     use Plack::Builder;
 
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug::DBIC::QueryLog', querylog_args => {passthrough => 1}; 
+        enable 'Debug';
+        enable 'Debug::DBIC::QueryLog',
+          querylog_args => {passthrough => 1};
         $app;
     };
 
@@ -43,8 +44,6 @@ L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>
         traits => ['QueryLog::AdoptPlack'],
         ## .. rest of configuration
 	});
-
-    1;
 
 =head1 DESCRIPTION
 
