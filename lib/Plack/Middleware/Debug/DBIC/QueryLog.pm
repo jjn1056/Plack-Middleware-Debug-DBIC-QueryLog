@@ -14,7 +14,7 @@ use SQL::Abstract::Tree;
 
 =head1 NAME
 
-Plack::Middleware::Debug::DBIC::QueryLog - Log DBIC Queries
+Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
 
 =head2 SYNOPSIS
 
@@ -75,7 +75,7 @@ all applications running inside of L<Plack>.  You need to 'tell' your applicatio
 instance of L<DBIx::Class> to use this C<$env> key and make sure you set
 L<DBIx::Class>'s debug object correctly:
 
-    my $querylog = $ctx->engine->env->{'plack.middleware.debug.dbic.querylog'};
+    my $querylog = $env->{'plack.middleware.debug.dbic.querylog'};
     $schema->storage->debugobj($querylog);
     $schema->storage->debug(1);
 
@@ -135,8 +135,7 @@ sub run {
         if(@{$querylog_analyzer->get_sorted_queries}) {
             $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
             $panel->content(sub {
-                    $self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
-                    ## $self->render($template, [$querylog, $querylog_analyzer]);
+                $self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
             });
         } else {
             $panel->nav_subtitle("No SQL");
@@ -152,6 +151,17 @@ __DATA__
 % my $qcount = $querylog->count;
 % my $total = sprintf('%.6f', $querylog->time_elapsed);
 % my $average_time = sprintf('%.6f', ($querylog->time_elapsed / $qcount));
+<style>
+#plDebug .select { color:red }
+#plDebug .insert-into { color:red }
+#plDebug .delete-from { color:red }
+#plDebug .where { color:green }
+#plDebug .join { color:blue }
+#plDebug .on { color:DodgerBlue  }
+#plDebug .from { color:purple }
+#plDebug .order-by { color:DarkCyan }
+#plDebug .placeholder {color:gray}
+</style>
 <div>
   <br/>
   <p>
