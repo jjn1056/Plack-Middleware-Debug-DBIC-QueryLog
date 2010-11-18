@@ -1,6 +1,6 @@
 # NAME
 
-Plack::Middleware::Debug::DBIC::QueryLog - Log DBIC Queries
+Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
 
 ## SYNOPSIS
 
@@ -8,14 +8,14 @@ Adds a debug panel and querylog object for logging [DBIx::Class](http://search.c
 support for [Catalyst](http://search.cpan.org/perldoc?Catalyst) via a [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog)
 compatible trait, [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack).
 
-
-
     use Plack::Builder;
 
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug::DBIC::QueryLog', querylog_args => {passthrough => 1}; 
+        enable 'Debug';
+        enable 'Debug::DBIC::QueryLog',
+          querylog_args => {passthrough => 1};
         $app;
     };
 
@@ -30,8 +30,6 @@ And in you [Catalyst](http://search.cpan.org/perldoc?Catalyst) application, if y
         traits => ['QueryLog::AdoptPlack'],
         ## .. rest of configuration
 	});
-
-    1;
 
 # DESCRIPTION
 
@@ -63,9 +61,9 @@ all applications running inside of [Plack](http://search.cpan.org/perldoc?Plack)
 instance of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) to use this `$env` key and make sure you set
 [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)'s debug object correctly:
 
-        my $querylog = $ctx->engine->env->{'plack.middleware.debug.dbic.querylog'};
-        $schema->storage->debugobj($querylog);
-        $schema->storage->debug(1);
+    my $querylog = $env->{'plack.middleware.debug.dbic.querylog'};
+    $schema->storage->debugobj($querylog);
+    $schema->storage->debug(1);
 
 That way when you view the debug panel, we have SQL to review.
 
