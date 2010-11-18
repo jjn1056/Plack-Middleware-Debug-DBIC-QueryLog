@@ -174,9 +174,9 @@ __DATA__
   <table id="box-table-a">
     <thead class="query_header">
       <tr>
-        <th>Time Elapsed</th>
-        <th>Percentage</th>
-        <th>SQL Statement</th>
+        <th style="padding-left:4px">Time</th>
+        <th style="padding-left:15px; padding-right:15px">Percent</th>
+        <th>SQL Statements</th>
       </tr>
     </thead>
     <tbody>
@@ -184,9 +184,9 @@ __DATA__
 % for my $q (@{$querylog_analyzer->get_sorted_queries}) {
 %   my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
        <tr <%= $even ? "class=plDebugOdd":"plDebugEven" %> >
-        <td style="padding-left:9px"><%= sprintf('%.7f', $q->time_elapsed) %></td>
-        <td style="padding-left:9px"><%= sprintf('%.2f', (($q->time_elapsed / $total ) * 100 )) %>%</td>
-        <td style="padding-left:9px; padding-bottom:6px"><%= $tree_info %></td>
+        <td style="padding-left:8px"><%= sprintf('%.7f', $q->time_elapsed) %></td>
+        <td style="padding-left:21px"><%= sprintf('%.2f', (($q->time_elapsed / $total ) * 100 )) %>%</td>
+        <td style="padding-left:6px; padding-bottom:6px"><%= $tree_info %></td>
       </tr>
 % $even = $even ? 0:1;
 % }
