@@ -10,6 +10,16 @@ extends 'Plack::Middleware::Debug::Base';
 our $VERSION = '0.04';
 sub PSGI_KEY { 'plack.middleware.dbic.querylog' }
 
+has 'sqla_tree_class' => (
+  is => 'ro',
+  default => sub {'SQL::Abstract::Tree'},
+);
+
+has 'sqla_tree_args' => (
+  is => 'ro',
+  default => sub { +{profile => 'html'} },
+);
+
 has 'sqla_tree' => (
   is => 'ro',
   lazy => 1,
@@ -20,16 +30,6 @@ sub _build_sqla_tree {
   Plack::Util::load_class($_[0]->sqla_tree_class)
     ->new($_[0]->sqla_tree_args);
 }
-
-has 'sqla_tree_class' => (
-  is => 'ro',
-  default => sub {'SQL::Abstract::Tree'},
-);
-
-has 'sqla_tree_args' => (
-  is => 'ro',
-  default => sub { +{profile => 'html'} },
-);
 
 has 'querylog_class' => (
   is => 'ro',
@@ -233,7 +233,7 @@ __DATA__
     <tbody>
 % my $even = 1;
 % for my $q (@{$querylog_analyzer->get_sorted_queries}) {
-%   my $tree_info = encoded_string($sqla_tree->format($q->sql, $q->params));
+%   my $tree_info = Text::MicroTemplate::encoded_string($sqla_tree->format($q->sql, $q->params));
        <tr <%= $even ? "class=plDebugOdd":"plDebugEven" %> >
         <td style="padding-left:8px"><%= sprintf('%.7f', $q->time_elapsed) %></td>
         <td style="padding-left:21px"><%= sprintf('%.2f', (($q->time_elapsed / $total ) * 100 )) %>%</td>
