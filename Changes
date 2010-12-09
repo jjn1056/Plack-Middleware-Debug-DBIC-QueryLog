@@ -1,5 +1,11 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.04    09 December 2010
+        - use Moo
+        - use Plack::Middleware::DBIC::QueryLog
+        - better tests
+        - documented above changes
+
 0.03    18 November 2010
         - using SQL::Abstract:Tree for neater appearance
         - and more css and html tweaks

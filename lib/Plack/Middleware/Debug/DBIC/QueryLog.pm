@@ -1,16 +1,92 @@
 package Plack::Middleware::Debug::DBIC::QueryLog;
-use parent qw(Plack::Middleware::Debug::Base);
-our $VERSION = "0.03";
 
-use 5.008;
-use strict;
-use warnings;
+use Moo;
+use Plack::Util;
+use Plack::Middleware::DBIC::QueryLog;
+use Text::MicroTemplate;
 
-use DBIx::Class::QueryLog;
-use DBIx::Class::QueryLog::Analyzer;
-use Text::MicroTemplate qw(encoded_string);
-use Plack::Util::Accessor qw(querylog querylog_args);
-use SQL::Abstract::Tree;
+extends 'Plack::Middleware::Debug::Base';
+
+our $VERSION = '0.04';
+sub PSGI_KEY { 'plack.middleware.dbic.querylog' }
+
+has 'sqla_tree' => (
+  is => 'ro',
+  lazy => 1,
+  builder => '_build_sqla_tree',
+);
+
+sub _build_sqla_tree {
+  Plack::Util::load_class($_[0]->sqla_tree_class)
+    ->new($_[0]->sqla_tree_args);
+}
+
+has 'sqla_tree_class' => (
+  is => 'ro',
+  default => sub {'SQL::Abstract::Tree'},
+);
+
+has 'sqla_tree_args' => (
+  is => 'ro',
+  default => sub { +{profile => 'html'} },
+);
+
+has 'querylog_class' => (
+  is => 'ro',
+  default => sub {'DBIx::Class::QueryLog'},
+);
+
+has 'querylog_args' => (
+  is => 'ro',
+  default => sub { +{} },
+);
+
+sub create_querylog {
+  Plack::Util::load_class($_[0]->querylog_class)
+    ->new($_[0]->querylog_args);
+}
+
+sub find_or_create_querylog {
+  $env->{+PSGI_KEY} ||= $self->create_querylog;
+}
+
+has template => (
+  is => 'ro',
+  builder => '_build_template',
+);
+
+sub _build_template {
+  __PACKAGE__->build_template(join '', <DATA>);
+}
+
+has 'querylog_analyzer_class' => (
+  is => 'ro',
+  default => sub { 'DBIx::Class::QueryLog::Analyzer' },
+);
+
+sub querylog_analyzer_for {
+  my ($self, $ql) = @_;
+  Plack::Util::load_class($_[0]->querylog_analyzer_class)
+    ->new({querylog => $ql});
+}
+
+sub run {
+  my ($self, $env, $panel) = @_;
+  my $querylog = $self->find_or_create_querylog;
+
+  $panel->title('DBIC::QueryLog');
+
+  return sub {
+    my $analyzer = $self->querylog_analyzer_for($querylog);
+    if(my @sorted_queries = $analyzer->get_sorted_queries) {
+      $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
+      $panel->content(sub { $template->($querylog, $querylog_analyzer, $sqla_tree) });
+    } else {
+      $panel->nav_subtitle("No SQL");
+      $panel->content("No DBIC log information");
+    }
+  };
+}
 
 =head1 NAME
 
@@ -119,48 +195,23 @@ it under the same terms as Perl itself.
 
 =cut
 
-my $template = __PACKAGE__->build_template(join '', <DATA>);
-my $sqla_tree = SQL::Abstract::Tree->new({profile => 'html'});
-
-sub run {
-    my ( $self, $env, $panel ) = @_;
-    my $querylog = $self->querylog ||
-    DBIx::Class::QueryLog->new($self->querylog_args || {});
-    $env->{'plack.middleware.debug.dbic.querylog'} = $querylog;
-    $panel->title('DBIC::QueryLog');
-    return sub {
-        my $querylog_analyzer = DBIx::Class::QueryLog::Analyzer->new({
-            querylog => $querylog,
-        });
-        if(@{$querylog_analyzer->get_sorted_queries}) {
-            $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
-            $panel->content(sub {
-                $self->render($template, [$querylog, $querylog_analyzer, $sqla_tree]);
-            });
-        } else {
-            $panel->nav_subtitle("No SQL");
-            $panel->content("No DBIC log information");
-        }
-    };
-}
-
 1;
 
 __DATA__
-% my ($querylog, $querylog_analyzer, $sqla_tree) = @{shift @_};
+% my ($querylog, $querylog_analyzer, $sqla_tree) = @_;
 % my $qcount = $querylog->count;
 % my $total = sprintf('%.6f', $querylog->time_elapsed);
 % my $average_time = sprintf('%.6f', ($querylog->time_elapsed / $qcount));
 <style>
-#plDebug .select { color:red }
-#plDebug .insert-into { color:red }
-#plDebug .delete-from { color:red }
-#plDebug .where { color:green }
-#plDebug .join { color:blue }
-#plDebug .on { color:DodgerBlue  }
-#plDebug .from { color:purple }
-#plDebug .order-by { color:DarkCyan }
-#plDebug .placeholder {color:gray}
+  #plDebug .select { color:red }
+  #plDebug .insert-into { color:red }
+  #plDebug .delete-from { color:red }
+  #plDebug .where { color:green }
+  #plDebug .join { color:blue }
+  #plDebug .on { color:DodgerBlue  }
+  #plDebug .from { color:purple }
+  #plDebug .order-by { color:DarkCyan }
+  #plDebug .placeholder {color:gray}
 </style>
 <div>
   <br/>

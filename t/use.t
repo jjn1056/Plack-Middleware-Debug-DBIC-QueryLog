@@ -1,7 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
+use strictures 1;
+use Test::More tests => 1;
 
-use_ok 'Plack::Middleware::Debug::DBIC::QueryLog';
+BEGIN { use_ok 'Plack::Middleware::Debug::DBIC::QueryLog' }
 
-done_testing;
