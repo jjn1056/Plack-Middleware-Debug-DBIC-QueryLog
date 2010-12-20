@@ -75,7 +75,6 @@ sub run {
   my $querylog = $self->find_or_create_querylog;
 
   $panel->title('DBIC::QueryLog');
-
   return sub {
     my $analyzer = $self->querylog_analyzer_for($querylog);
     if(my @sorted_queries = $analyzer->get_sorted_queries) {
@@ -211,7 +210,7 @@ __DATA__
   #plDebug .on { color:DodgerBlue  }
   #plDebug .from { color:purple }
   #plDebug .order-by { color:DarkCyan }
-  #plDebug .placeholder {color:gray}
+  #plDebug .placeholder { color:gray }
 </style>
 <div>
   <br/>
@@ -245,4 +244,5 @@ __DATA__
   </table>
 </div>
 <br/>
+
 
