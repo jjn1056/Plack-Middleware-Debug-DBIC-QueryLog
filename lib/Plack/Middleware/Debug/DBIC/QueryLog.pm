@@ -70,7 +70,6 @@ sub run {
   my $querylog = $env->{+PSGI_KEY}
     ||= $self->create_querylog; 
 
-
   $panel->title('DBIC::QueryLog');
   return sub {
     my $analyzer = $self->querylog_analyzer_for($querylog);
@@ -101,10 +100,8 @@ compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlac
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug';
-        enable 'Debug::DBIC::QueryLog',
-          querylog_args => {passthrough => 1};
-        $app;
+      enable 'Debug', panels =>['DBIC::QueryLog']; 
+      $app;
     };
 
 And in you L<Catalyst> application, if you are also using
