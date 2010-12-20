@@ -37,4 +37,5 @@ builder {
   };
 };
 
-## DBIC_TRACE=1 plackup -I lib -I example/lib/ example/app.psgi
+## Dependent Modules: (Plack, DBIx::Class, Test::DBIx::Class, strictures).
+## Example commandline: "plackup -I lib -I example/lib/ example/app.psgi".
