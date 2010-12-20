@@ -1,5 +1,8 @@
+#!/usr/bin/env perl
+
 use strictures 1;
 use Plack::Builder;
+use Example::Schema;
 
 builder {
   enable 'Debug', panels =>['DBIC::QueryLog'];
