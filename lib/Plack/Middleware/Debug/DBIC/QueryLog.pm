@@ -2,7 +2,6 @@ package Plack::Middleware::Debug::DBIC::QueryLog;
 
 use Moo;
 use Plack::Util;
-use Plack::Middleware::DBIC::QueryLog;
 use Text::MicroTemplate;
 
 extends 'Plack::Middleware::Debug::Base';
@@ -46,10 +45,6 @@ sub create_querylog {
     ->new($_[0]->querylog_args);
 }
 
-sub find_or_create_querylog {
-  $env->{+PSGI_KEY} ||= $self->create_querylog;
-}
-
 has template => (
   is => 'ro',
   builder => '_build_template',
@@ -72,14 +67,18 @@ sub querylog_analyzer_for {
 
 sub run {
   my ($self, $env, $panel) = @_;
-  my $querylog = $self->find_or_create_querylog;
+  my $querylog = $env->{+PSGI_KEY}
+    ||= $self->create_querylog; 
+
 
   $panel->title('DBIC::QueryLog');
   return sub {
     my $analyzer = $self->querylog_analyzer_for($querylog);
-    if(my @sorted_queries = $analyzer->get_sorted_queries) {
+    my @sorted_queries = @{$analyzer->get_sorted_queries||[]};
+
+    if(@sorted_queries) {
       $panel->nav_subtitle(sprintf('Total Time: %.6f', $querylog->time_elapsed));
-      $panel->content(sub { $template->($querylog, $querylog_analyzer, $sqla_tree) });
+      $panel->content(sub { $self->template->($querylog, $analyzer, $self->sqla_tree) });
     } else {
       $panel->nav_subtitle("No SQL");
       $panel->content("No DBIC log information");
