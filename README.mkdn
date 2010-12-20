@@ -13,10 +13,8 @@ compatible trait, [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug';
-        enable 'Debug::DBIC::QueryLog',
-          querylog_args => {passthrough => 1};
-        $app;
+      enable 'Debug', panels =>['DBIC::QueryLog']; 
+      $app;
     };
 
 And in you [Catalyst](http://search.cpan.org/perldoc?Catalyst) application, if you are also using
@@ -56,34 +54,38 @@ Additionally, it would be nice if we could provide this functionality for all
 a neat Plack based Debug panel.  This bit of middleware provides that function.
 
 Basically we create a new instance of [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) and place it
-into `$env->{'plack.middleware.debug.dbic.querylog'}` so that it is accessible by
+into `$env->{'plack.middleware.dbic.querylog'}` so that it is accessible by
 all applications running inside of [Plack](http://search.cpan.org/perldoc?Plack).  You need to 'tell' your application's
 instance of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) to use this `$env` key and make sure you set
 [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)'s debug object correctly:
 
-    my $querylog = $env->{'plack.middleware.debug.dbic.querylog'};
-    $schema->storage->debugobj($querylog);
-    $schema->storage->debug(1);
+    use Plack::Middleware::Debug::DBIC::QueryLog;
+    my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
+    my $cloned_schema = $schema->clone;
+    $cloned_schema->storage->debug(1);
+    $cloned_schema->storage->debugobj($querylog);
 
 That way when you view the debug panel, we have SQL to review.
 
-If you are using [Catalyst](http://search.cpan.org/perldoc?Catalyst) and a modern [Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) you
-can use the trait
-[Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack), which is
-compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog).  See the
-L</SYNOPSIS> example for more details.
+There's an application in '/example' you can review for help.  However, if you
+are using [Catalyst](http://search.cpan.org/perldoc?Catalyst) and a modern [Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) you can use
+the trait [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack),
+which is compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog).
+
+See the L</SYNOPSIS> example for more details.
 
 # OPTIONS
 
 This debug panel defines the following options.
 
-## querylog
+## querylog_class
 
-Takes a [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) object, which is used as the querylog for the
-application.  If you don't provide this, we will build one automatically, using
-L</querylog_args> if provided.  Generally you will use this only if you are
-instantiating a querylog object outside your [Plack](http://search.cpan.org/perldoc?Plack) based application, such
-as in an IOC container like [Bread::Board](http://search.cpan.org/perldoc?Bread::Board).
+This is the class which is used to build the `querylog` unless one is already
+defined.  It defaults to [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).  You should probably leave
+this alone unless you need to subclass or augment [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).
+
+If the class name you pass has not already been included (via `use` or 
+`require`) we will automatically try to c<require> it.
 
 ## querylog_args
 

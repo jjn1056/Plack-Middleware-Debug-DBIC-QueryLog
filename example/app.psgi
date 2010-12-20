@@ -8,6 +8,7 @@ use Test::DBIx::Class
   qw(:resultsets);
 
 User->create({email =>'jjnapiork@cpan.org'});
+User->create({email =>'tester@test.org'});
 
 builder {
   enable 'Debug', panels =>['DBIC::QueryLog'];
@@ -16,6 +17,7 @@ builder {
     my $schema = Schema->clone;
     my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
 
+    $schema->storage->debug(1);
     $schema->storage->debugobj($querylog);
 
     return [
