@@ -1,9 +1,9 @@
 use strictures 1;
 use Plack::Builder;
 
-$app = builder {
+builder {
   enable 'Debug', panels =>['DBIC::QueryLog'];
-  $app = sub {
+  sub {
     return [
       200, ['Content-Type' =>'text/html'],
       [
