@@ -3,10 +3,11 @@ package Plack::Middleware::Debug::DBIC::QueryLog;
 use Moo;
 use Plack::Util;
 use Text::MicroTemplate;
+use 5.008008;
 
 extends 'Plack::Middleware::Debug::Base';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 sub PSGI_KEY { 'plack.middleware.dbic.querylog' }
 
 has 'sqla_tree_class' => (
@@ -95,7 +96,7 @@ sub run {
 
 Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
 Adds a debug panel and querylog object for logging L<DBIx::Class> queries.  Has
 support for L<Catalyst> via a L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>
@@ -116,11 +117,11 @@ L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>
     package MyApp::Web::Model::Schema;
     use parent 'Catalyst::Model::DBIC::Schema';
 
-	__PACKAGE__->config({
-        schema_class => 'MyApp::Schema',
-        traits => ['QueryLog::AdoptPlack'],
-        ## .. rest of configuration
-	});
+    __PACKAGE__->config({
+      schema_class => 'MyApp::Schema',
+      traits => ['QueryLog::AdoptPlack'],
+      ## .. rest of configuration
+    });
 
 =head1 DESCRIPTION
 
@@ -165,6 +166,9 @@ are using L<Catalyst> and a modern L<Catalyst::Model::DBIC::Schema> you can use
 the trait L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>,
 which is compatible with L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>.
 
+If you want a querylog but don't want or need the L<Plack> debug panel, you
+should take a look at L<Plack::Middleware::DBIC::QueryLog>.
+
 See the L</SYNOPSIS> example for more details.
 
 =head1 OPTIONS
@@ -178,7 +182,7 @@ defined.  It defaults to L<DBIx::Class::QueryLog>.  You should probably leave
 this alone unless you need to subclass or augment L<DBIx::Class::QueryLog>.
 
 If the class name you pass has not already been included (via C<use> or 
-C<require>) we will automatically try to c<require> it.
+C<require>) we will automatically try to C<require> it.
 
 =head2 querylog_args
 

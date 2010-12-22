@@ -1,5 +1,11 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.05    22 December 2010
+        - fixed some pod errors
+        - updated docs
+        - notices if you have an incompatible Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
+          and says you should update.
+
 0.04    09 December 2010
         - use Moo
         - better tests

@@ -2,7 +2,7 @@
 
 Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
 
-## SYNOPSIS
+# SYNOPSIS
 
 Adds a debug panel and querylog object for logging [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) queries.  Has
 support for [Catalyst](http://search.cpan.org/perldoc?Catalyst) via a [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog)
@@ -23,11 +23,11 @@ And in you [Catalyst](http://search.cpan.org/perldoc?Catalyst) application, if y
     package MyApp::Web::Model::Schema;
     use parent 'Catalyst::Model::DBIC::Schema';
 
-	__PACKAGE__->config({
-        schema_class => 'MyApp::Schema',
-        traits => ['QueryLog::AdoptPlack'],
-        ## .. rest of configuration
-	});
+    __PACKAGE__->config({
+      schema_class => 'MyApp::Schema',
+      traits => ['QueryLog::AdoptPlack'],
+      ## .. rest of configuration
+    });
 
 # DESCRIPTION
 
@@ -72,6 +72,9 @@ are using [Catalyst](http://search.cpan.org/perldoc?Catalyst) and a modern [Cata
 the trait [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack),
 which is compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog).
 
+If you want a querylog but don't want or need the [Plack](http://search.cpan.org/perldoc?Plack) debug panel, you
+should take a look at [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog).
+
 See the L</SYNOPSIS> example for more details.
 
 # OPTIONS
@@ -85,7 +88,7 @@ defined.  It defaults to [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?
 this alone unless you need to subclass or augment [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).
 
 If the class name you pass has not already been included (via `use` or 
-`require`) we will automatically try to c<require> it.
+`require`) we will automatically try to `require` it.
 
 ## querylog_args
 
