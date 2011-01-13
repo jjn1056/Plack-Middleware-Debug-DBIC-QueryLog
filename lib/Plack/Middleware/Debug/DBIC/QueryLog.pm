@@ -7,7 +7,7 @@ use 5.008008;
 
 extends 'Plack::Middleware::Debug::Base';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 sub PSGI_KEY { 'plack.middleware.dbic.querylog' }
 
 has 'sqla_tree_class' => (
@@ -84,7 +84,7 @@ sub run {
         sql_formatter => sub { $self->sqla_tree->format(@_) },
       );
       $panel->nav_subtitle(sprintf('Total Time: %.6f', $args{elapsed_time}));
-      $panel->content(sub { $self->template->(%args) });
+      $panel->content($self->template->(%args));
     } else {
       $panel->nav_subtitle("No SQL");
       $panel->content("No DBIC log information");
@@ -115,7 +115,8 @@ And in you L<Catalyst> application, if you are also using
 L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack>
 
     package MyApp::Web::Model::Schema;
-    use parent 'Catalyst::Model::DBIC::Schema';
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
 
     __PACKAGE__->config({
       schema_class => 'MyApp::Schema',
@@ -198,6 +199,8 @@ L<Catalyst::Model::DBIC::Schema>, L<Catalyst::TraitFor::Model::DBIC::Schema::Que
 John Napiorkowski, C<< <jjnapiork@cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
+
+Copyright 2011 John Napiorkowski
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

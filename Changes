@@ -1,5 +1,10 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.06    13 January 2011
+        - Update copyright info
+        - Fixed memory leak issue
+        - Increased minimum Moo requirement
+
 0.05    22 December 2010
         - fixed some pod errors
         - updated docs

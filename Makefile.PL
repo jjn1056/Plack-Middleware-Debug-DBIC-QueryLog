@@ -46,7 +46,7 @@ requires 'Plack::Middleware::Debug';
 requires 'DBIx::Class::QueryLog';
 requires 'DBIx::Class::QueryLog::Analyzer';
 requires 'SQL::Abstract' => '1.70';
-requires 'Moo' => '0.009004';
+requires 'Moo' => '0.009005';
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.96';

@@ -11,7 +11,7 @@ User->create({email =>'jjnapiork@cpan.org'});
 User->create({email =>'tester@test.org'});
 
 builder {
-  enable 'Debug', panels =>['DBIC::QueryLog'];
+  enable 'Debug', panels =>['DBIC::QueryLog', 'Memory'];
   sub {
     my $env = shift;
     my $schema = Schema->clone;

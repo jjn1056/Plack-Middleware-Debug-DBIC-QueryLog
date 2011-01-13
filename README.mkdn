@@ -75,7 +75,7 @@ which is compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](htt
 If you want a querylog but don't want or need the [Plack](http://search.cpan.org/perldoc?Plack) debug panel, you
 should take a look at [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog).
 
-See the L</SYNOPSIS> example for more details.
+See the [SYNOPSIS](#pod_SYNOPSIS) example for more details.
 
 # OPTIONS
 
