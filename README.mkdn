@@ -21,7 +21,8 @@ And in you [Catalyst](http://search.cpan.org/perldoc?Catalyst) application, if y
 [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack)
 
     package MyApp::Web::Model::Schema;
-    use parent 'Catalyst::Model::DBIC::Schema';
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
 
     __PACKAGE__->config({
       schema_class => 'MyApp::Schema',
@@ -104,6 +105,8 @@ Takes a HashRef which is passed to [DBIx::Class::QueryLog](http://search.cpan.or
 John Napiorkowski, `<jjnapiork@cpan.org>`
 
 # COPYRIGHT & LICENSE
+
+Copyright 2011 John Napiorkowski
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
