@@ -1,46 +1,8 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings FATAL => 'all';
-use inc::Module::Install;
+use maint::Maker;
 
-if(
-  my $v = eval q{
-    use Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack;
-    $Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack::VERSION
-  }
-) {
-  if($v < 0.03) {
-    warn <<MSG;
-
-###############################################################################
-##  WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING  ##
-###############################################################################
-
-Your version of Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
-is too old.  Please upgrade it (should be 100% drop in replacement).  Otherwise
-you will not log queries probably for your Catalyt based applications.
-
-If you are using this in a custom application please change your Makefile.PL to
-use a more modern version.  If you are seeing this message while installing a
-third party application, please log it as a bug with the third party.
-
-Sorry for the trouble.  --THE AUTHOR
-
-###############################################################################
-##  WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING  ##
-###############################################################################
-
-MSG
-
-     feature(
-      'upgrade incompatible versions',
-       -default => 1,
-       'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack' => '0.03',
-     );
-  }
-}
-
+all_from 'lib/Plack/Middleware/Debug/DBIC/QueryLog.pm';
 requires 'Plack';
 requires 'Plack::Middleware::Debug';
 requires 'DBIx::Class::QueryLog';
@@ -50,10 +12,10 @@ requires 'Moo' => '0.009005';
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.96';
+test_requires 'Plack::Test'
+test_requires 'Plack::Builder';
+test_requires 'HTTP::Request::Common';
+test_requires 'Scalar::Util'
+test_requires 'Data::Dump'
 
-all_from 'lib/Plack/Middleware/Debug/DBIC/QueryLog.pm';
-require 'maint/Makefile.PL.include'
-  if $Module::Install::AUTHOR;
-
-WriteAll;
-
+tests_recursive;
