@@ -6,13 +6,14 @@ use Test::More;
 use Plack::Test;
 use Plack::Builder;
 use Plack::Middleware::Debug::DBIC::QueryLog;
+use Plack::Middleware::DBIC::QueryLog;
 use HTTP::Request::Common qw(GET);
 use Scalar::Util qw(refaddr);
 use Data::Dump ();
 
 ok my $app = sub {
   my $env = shift;
-  my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
+  my $querylog = Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env);
   my %tests = (
     key_exists => ($querylog ? 1:0),
     refaddr => refaddr($querylog),

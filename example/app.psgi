@@ -3,6 +3,7 @@
 use strictures 1;
 use Plack::Builder;
 use Plack::Middleware::Debug::DBIC::QueryLog;
+use Plack::Middleware::DBIC::QueryLog;
 use Test::DBIx::Class
   -schema_class => 'Example::Schema',
   qw(:resultsets);
@@ -15,7 +16,7 @@ builder {
   sub {
     my $env = shift;
     my $schema = Schema->clone;
-    my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
+    my $querylog = Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env);
 
     $schema->storage->debug(1);
     $schema->storage->debugobj($querylog);

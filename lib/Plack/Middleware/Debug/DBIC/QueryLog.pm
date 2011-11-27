@@ -1,14 +1,13 @@
 package Plack::Middleware::Debug::DBIC::QueryLog;
 
 use Moo;
-use Plack::Util;
 use Text::MicroTemplate;
+use Plack::Middleware::DBIC::QueryLog;
 use 5.008008;
 
 extends 'Plack::Middleware::Debug::Base';
 
-our $VERSION = '0.06';
-sub PSGI_KEY { 'plack.middleware.dbic.querylog' }
+our $VERSION = '0.07';
 
 has 'sqla_tree_class' => (
   is => 'ro',
@@ -31,20 +30,8 @@ sub _build_sqla_tree {
     ->new($_[0]->sqla_tree_args);
 }
 
-has 'querylog_class' => (
-  is => 'ro',
-  default => sub {'DBIx::Class::QueryLog'},
-);
-
-has 'querylog_args' => (
-  is => 'ro',
-  default => sub { +{} },
-);
-
-sub create_querylog {
-  Plack::Util::load_class($_[0]->querylog_class)
-    ->new($_[0]->querylog_args);
-}
+has 'querylog_class' => ( is => 'ro' );
+has 'querylog_args' => ( is => 'ro' );
 
 has template => (
   is => 'ro',
@@ -66,12 +53,22 @@ sub querylog_analyzer_for {
     ->new({querylog => $ql});
 }
 
+sub find_or_create_querylog {
+  my ($self, $env) = @_;
+  Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env) || do {
+    my %args = map { $_ => $self->$_ } grep { $self->$_ }
+      qw(querylog_class querylog_args);
+  
+    Plack::Middleware::DBIC::QueryLog->new(%args)
+      ->find_or_create_querylog_in($env);
+  };
+}
+
 sub run {
   my ($self, $env, $panel) = @_;
-  my $querylog = $env->{+PSGI_KEY}
-    ||= $self->create_querylog; 
-
+  my $querylog = $self->find_or_create_querylog($env);
   $panel->title('DBIC::QueryLog');
+
   return sub {
     my $analyzer = $self->querylog_analyzer_for($querylog);
     my @sorted_queries = @{$analyzer->get_sorted_queries||[]};

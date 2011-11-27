@@ -1,5 +1,10 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.07    26 November 2011
+        - Added missing dependencies
+        - use the interface to the PSGI querylog exposed by
+          Plack::Middleware::DBIC::QueryLog rather than build our own
+
 0.06    13 January 2011
         - Update copyright info
         - Fixed memory leak issue
