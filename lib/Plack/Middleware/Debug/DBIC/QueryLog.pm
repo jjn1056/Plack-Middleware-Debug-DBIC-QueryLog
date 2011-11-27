@@ -7,7 +7,7 @@ use 5.008008;
 
 extends 'Plack::Middleware::Debug::Base';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has 'sqla_tree_class' => (
   is => 'ro',
