@@ -1,6 +1,10 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.08    27 November 2011
+        - Fix for busted Makefile.PL in previous release
+
 0.07    26 November 2011
+        - (Broken Makefile.PL, removed from CPAN)
         - Added missing dependencies
         - use the interface to the PSGI querylog exposed by
           Plack::Middleware::DBIC::QueryLog rather than build our own
