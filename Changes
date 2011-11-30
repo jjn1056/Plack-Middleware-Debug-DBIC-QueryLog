@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
 
+0.09    30 November 2011
+        - Updated incorrect documentation on how to hook up a querylog to
+          a DBIC schema instance.
+
 0.08    27 November 2011
         - Fix for busted Makefile.PL in previous release
 

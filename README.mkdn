@@ -1,6 +1,6 @@
 # NAME
 
-Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
+Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer
 
 # SYNOPSIS
 
@@ -13,7 +13,7 @@ compatible trait, [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
     my $app = ...; ## Build your Plack App
 
     builder {
-      enable 'Debug', panels =>['DBIC::QueryLog']; 
+      enable 'Debug', panels =>['DBIC::QueryLog'];
       $app;
     };
 
@@ -55,18 +55,28 @@ Additionally, it would be nice if we could provide this functionality for all
 a neat Plack based Debug panel.  This bit of middleware provides that function.
 
 Basically we create a new instance of [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) and place it
-into `$env->{'plack.middleware.dbic.querylog'}` so that it is accessible by
+into `$env->{'plack.middleware.dbic.querylog'}` (We use the underlying
+features in [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog)) so that it is accessible by
 all applications running inside of [Plack](http://search.cpan.org/perldoc?Plack).  You need to 'tell' your application's
 instance of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) to use this `$env` key and make sure you set
-[DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)'s debug object correctly:
+[DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)'s debug object correctly.  The officially supported interface for
+this in via the supporting class [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog):
 
-    use Plack::Middleware::Debug::DBIC::QueryLog;
-    my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
+    use Plack::Middleware::DBIC::QueryLog;
+
+    my $querylog = Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env);
     my $cloned_schema = $schema->clone;
     $cloned_schema->storage->debug(1);
     $cloned_schema->storage->debugobj($querylog);
 
-That way when you view the debug panel, we have SQL to review.
+In this example `$env` is a [Plack](http://search.cpan.org/perldoc?Plack) environment, typically passed into your PSGI
+compliant application and `$schema` is an instance of [DBIx::Class::Schema](http://search.cpan.org/perldoc?DBIx::Class::Schema)
+
+We clone `$schema` to avoid associating the querylog with the global, persistant
+DBIC schema object.
+
+Then you need to enable the Debug panel, as in the [\SYNOPSIS](http://search.cpan.org/perldoc?\SYNOPSIS).  That way when
+you view the debug panel, we have SQL to review.
 
 There's an application in '/example' you can review for help.  However, if you
 are using [Catalyst](http://search.cpan.org/perldoc?Catalyst) and a modern [Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) you can use
@@ -76,7 +86,7 @@ which is compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](htt
 If you want a querylog but don't want or need the [Plack](http://search.cpan.org/perldoc?Plack) debug panel, you
 should take a look at [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog).
 
-See the [SYNOPSIS](#pod_SYNOPSIS) example for more details.
+See the ["SYNOPSIS"](#SYNOPSIS) example for more details.
 
 # OPTIONS
 
@@ -88,7 +98,7 @@ This is the class which is used to build the `querylog` unless one is already
 defined.  It defaults to [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).  You should probably leave
 this alone unless you need to subclass or augment [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).
 
-If the class name you pass has not already been included (via `use` or 
+If the class name you pass has not already been included (via `use` or
 `require`) we will automatically try to `require` it.
 
 ## querylog_args

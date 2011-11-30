@@ -7,7 +7,7 @@ use 5.008008;
 
 extends 'Plack::Middleware::Debug::Base';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has 'sqla_tree_class' => (
   is => 'ro',
@@ -58,7 +58,7 @@ sub find_or_create_querylog {
   Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env) || do {
     my %args = map { $_ => $self->$_ } grep { $self->$_ }
       qw(querylog_class querylog_args);
-  
+
     Plack::Middleware::DBIC::QueryLog->new(%args)
       ->find_or_create_querylog_in($env);
   };
@@ -91,7 +91,7 @@ sub run {
 
 =head1 NAME
 
-Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer 
+Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ compatible trait, L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlac
     my $app = ...; ## Build your Plack App
 
     builder {
-      enable 'Debug', panels =>['DBIC::QueryLog']; 
+      enable 'Debug', panels =>['DBIC::QueryLog'];
       $app;
     };
 
@@ -146,18 +146,28 @@ L<Plack::Middleware::Debug> so that the table of our querylog would appear as
 a neat Plack based Debug panel.  This bit of middleware provides that function.
 
 Basically we create a new instance of L<DBIx::Class::QueryLog> and place it
-into C<< $env->{'plack.middleware.dbic.querylog'} >> so that it is accessible by
+into C<< $env->{'plack.middleware.dbic.querylog'} >> (We use the underlying
+features in L<Plack::Middleware::DBIC::QueryLog>) so that it is accessible by
 all applications running inside of L<Plack>.  You need to 'tell' your application's
 instance of L<DBIx::Class> to use this C<$env> key and make sure you set
-L<DBIx::Class>'s debug object correctly:
+L<DBIx::Class>'s debug object correctly.  The officially supported interface for
+this in via the supporting class L<Plack::Middleware::DBIC::QueryLog>:
 
-    use Plack::Middleware::Debug::DBIC::QueryLog;
-    my $querylog = $env->{+Plack::Middleware::Debug::DBIC::QueryLog::PSGI_KEY};
+    use Plack::Middleware::DBIC::QueryLog;
+
+    my $querylog = Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env);
     my $cloned_schema = $schema->clone;
     $cloned_schema->storage->debug(1);
     $cloned_schema->storage->debugobj($querylog);
 
-That way when you view the debug panel, we have SQL to review.
+In this example C<$env> is a L<Plack> environment, typically passed into your PSGI
+compliant application and C<$schema> is an instance of L<DBIx::Class::Schema>
+
+We clone C<$schema> to avoid associating the querylog with the global, persistant
+DBIC schema object.
+
+Then you need to enable the Debug panel, as in the L<\SYNOPSIS>.  That way when
+you view the debug panel, we have SQL to review.
 
 There's an application in '/example' you can review for help.  However, if you
 are using L<Catalyst> and a modern L<Catalyst::Model::DBIC::Schema> you can use
@@ -179,7 +189,7 @@ This is the class which is used to build the C<querylog> unless one is already
 defined.  It defaults to L<DBIx::Class::QueryLog>.  You should probably leave
 this alone unless you need to subclass or augment L<DBIx::Class::QueryLog>.
 
-If the class name you pass has not already been included (via C<use> or 
+If the class name you pass has not already been included (via C<use> or
 C<require>) we will automatically try to C<require> it.
 
 =head2 querylog_args
